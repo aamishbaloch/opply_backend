@@ -1,14 +1,11 @@
-from django.contrib.auth import get_user_model
 from django.db import transaction
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from api.v1.serializers import OrderSerializer
+from api.v1.serializers import OrderSerializer, OrderDetailSerializer
 from entities.order.models import Order, OrderItem
-
-User = get_user_model()
 
 
 class OrderCreateAPIView(generics.CreateAPIView):
@@ -39,3 +36,11 @@ class OrderCreateAPIView(generics.CreateAPIView):
             order.items.add(order_item)
 
         return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)
+
+
+class OrderHistoryAPIView(generics.ListAPIView):
+    serializer_class = OrderDetailSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self, *args, **kwargs):
+        return Order.objects.filter(customer_id=self.request.user.id)
