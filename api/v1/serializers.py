@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from entities.customer.models import Customer
+from entities.order.models import OrderItem, Order
 from entities.product.models import Product
 
 User = get_user_model()
@@ -26,3 +28,19 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ["id", "name", "price", "quantity"]
+
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderItem
+        fields = ["id", "product", "buying_price", "quantity"]
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    items = OrderItemSerializer(many=True)
+
+    class Meta:
+        model = Order
+        fields = ('id', 'customer_id', 'items')
+        read_only_fields = ['id']
+

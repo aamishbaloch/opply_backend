@@ -15,3 +15,14 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    def is_available(self, required_quantity):
+        return True if self.quantity >= required_quantity else False
+
+    def sell_if_available(self, required_quantity):
+        if not self.is_available(required_quantity):
+            return False
+        self.quantity -= required_quantity
+        self.save()
+        return True
+
